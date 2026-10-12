@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TeaBliss - API Tester</title>
+  <script>
+    if (!new URLSearchParams(location.search).has('api')) {
+      location.replace('store.html');
+    }
+  </script>
+  <style>
+    :root { --green:#245c46; --mint:#eaf4ee; --line:#dce5df; --text:#20332a; --muted:#66766d; --red:#a52c35; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:Arial, sans-serif; background:#f5f8f5; color:var(--text); }
+    header { background:var(--green); color:white; padding:22px max(20px, calc((100% - 1100px)/2)); }
+    header h1 { margin:0 0 6px; font-size:25px; } header p { margin:0; opacity:.85; }
+    main { max-width:1100px; margin:24px auto; padding:0 16px; display:grid; grid-template-columns:260px minmax(0,1fr); gap:20px; }
+    aside, section { background:white; border:1px solid var(--line); border-radius:12px; padding:18px; }
+    aside h2, section h2 { font-size:17px; margin:0 0 14px; }
+    .nav { display:flex; flex-direction:column; gap:8px; }
+    .nav button { text-align:left; border:1px solid var(--line); background:white; padding:11px 12px; border-radius:8px; cursor:pointer; color:var(--text); }
+    .nav button.active, .nav button:hover { background:var(--mint); border-color:#9abbaa; }
+    .hint { color:var(--muted); font-size:13px; line-height:1.5; }
+    label { display:block; font-size:13px; font-weight:700; margin:12px 0 6px; }
+    input, textarea, select { width:100%; padding:10px; border:1px solid #cbd7cf; border-radius:7px; font:inherit; background:#fff; }
+    textarea { min-height:70px; resize:vertical; }
+    .grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:16px; }
+    .primary, .secondary { border:0; border-radius:8px; padding:10px 15px; cursor:pointer; font-weight:700; }
+    .primary { background:var(--green); color:white; } .secondary { background:#edf1ee; color:var(--text); }
+    .result { margin-top:20px; border-top:1px solid var(--line); padding-top:16px; }
+    .status { font-weight:700; margin-bottom:10px; } .ok { color:#167447; } .bad { color:var(--red); }
+    pre { white-space:pre-wrap; overflow-wrap:anywhere; background:#17231d; color:#e4f4e9; border-radius:8px; padding:14px; min-height:90px; font-size:13px; }
+    .hidden { display:none; }
+    @media(max-width:760px) { main { grid-template-columns:1fr; } .grid { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+<header><h1>TeaBliss · API Tester</h1><p>Web kiểm thử API Django REST Framework</p></header>
+<main>
+  <aside>
+    <h2>Chọn API</h2>
+    <div class="nav">
+      <button class="active" data-mode="register">Đăng ký</button>
+      <button data-mode="login">Đăng nhập</button>
+      <button data-mode="profile">Xem profile</button>
+      <button data-mode="profilePut">Cập nhật profile</button>
+      <button data-mode="addresses">Danh sách địa chỉ</button>
+      <button data-mode="addressPost">Thêm địa chỉ</button>
+      <button data-mode="addressPut">Sửa địa chỉ</button>
+      <button data-mode="addressDelete">Xóa địa chỉ</button>
+      <button data-mode="password">Đổi mật khẩu</button>
+      <button data-mode="cart">Xem giỏ hàng</button>
+      <button data-mode="cartAdd">Thêm sản phẩm vào giỏ</button>
+      <button data-mode="cartUpdate">Sửa số lượng trong giỏ</button>
+      <button data-mode="cartDelete">Xóa sản phẩm khỏi giỏ</button>
+    </div>
+    <label for="baseUrl">Địa chỉ backend</label>
+    <input id="baseUrl" value="http://127.0.0.1:8000">
+    <label for="token">JWT access token</label>
+    <textarea id="token" placeholder="Token tự điền sau khi đăng nhập hoặc dán token vào đây"></textarea>
+    <p class="hint">Giữ Django runserver đang chạy. Token chỉ được giữ trong trang hiện tại, không tự lưu.</p>
+  </aside>
+  <section>
+    <h2 id="title">Đăng ký</h2>
+    <p class="hint" id="description">Tạo tài khoản khách hàng mới.</p>
+    <form id="apiForm">
+      <div id="fields"></div>
+      <div class="actions">
+        <button class="primary" type="submit">Gửi request</button>
+        <button class="secondary" type="button" id="clear">Xóa kết quả</button>
+      </div>
+    </form>
+    <div class="result">
+      <div id="status" class="status">Chưa gửi request</div>
+      <div class="hint">Response</div>
+      <pre id="response">Kết quả API sẽ hiển thị tại đây.</pre>
+    </div>
+  </section>
+</main>
+<script>
+const configs = {
+  register: { title:'Đăng ký', desc:'POST /api/auth/register/', method:'POST', path:'/api/auth/register/', fields:[
+    ['full_name','Họ và tên','text','Nguyen Van A'],['email','Email','email','a@example.com'],['phone','Số điện thoại','text','0123456789'],['password','Mật khẩu','password','Abc12345@']
+  ]},
+  login: { title:'Đăng nhập', desc:'POST /api/auth/login/', method:'POST', path:'/api/auth/login/', fields:[
+    ['email','Email','email','a@example.com'],['password','Mật khẩu','password','Abc12345@']
+  ]},
+  profile: { title:'Xem profile', desc:'GET /api/profile', method:'GET', path:'/api/profile', fields:[] },
+  profilePut: { title:'Cập nhật profile', desc:'PUT /api/profile', method:'PUT', path:'/api/profile', fields:[
+    ['full_name','Họ và tên','text','Nguyen Van A'],['email','Email','email','a@example.com'],['phone','Số điện thoại','text','0123456789'],['role','Vai trò (nếu API cho phép)','text','CUSTOMER']
+  ]},
+  addresses: { title:'Danh sách địa chỉ', desc:'GET /api/profile/addresses', method:'GET', path:'/api/profile/addresses', fields:[] },
+  addressPost: { title:'Thêm địa chỉ', desc:'POST /api/profile/addresses', method:'POST', path:'/api/profile/addresses', fields:[
+    ['recipient_name','Tên người nhận','text','Nguyen Van A'],['phone','Số điện thoại','text','0123456789'],['province','Tỉnh/Thành phố','text','Ha Noi'],['district','Quận/Huyện','text','Cau Giay'],['ward','Phường/Xã','text','Dich Vong'],['detail_address','Địa chỉ chi tiết','text','So 1 duong X'],['is_default','Địa chỉ mặc định (true/false)','text','true']
+  ]},
+  addressPut: { title:'Sửa địa chỉ', desc:'PUT /api/profile/addresses/{id}', method:'PUT', path:'/api/profile/addresses/{id}', fields:[
+    ['id','ID địa chỉ','number','1'],['recipient_name','Tên người nhận','text','Nguyen Van A'],['phone','Số điện thoại','text','0123456789'],['province','Tỉnh/Thành phố','text','Ha Noi'],['district','Quận/Huyện','text','Cau Giay'],['ward','Phường/Xã','text','Dich Vong'],['detail_address','Địa chỉ chi tiết','text','So 10 duong Y'],['is_default','Địa chỉ mặc định (true/false)','text','false']
+  ]},
+  addressDelete: { title:'Xóa địa chỉ', desc:'DELETE /api/profile/addresses/{id}', method:'DELETE', path:'/api/profile/addresses/{id}', fields:[['id','ID địa chỉ','number','1']]},
+  password: { title:'Đổi mật khẩu', desc:'PUT /api/profile/password', method:'PUT', path:'/api/profile/password', fields:[
+    ['old_password','Mật khẩu cũ','password','Abc12345@'],['new_password','Mật khẩu mới','password','NewAbc12345@']
+  ]},
+  cart: {
+    title: 'Xem giỏ hàng',
+    desc: 'GET /api/cart/',
+    method: 'GET',
+    path: '/api/cart/',
+    fields: []
+  },
+  cartAdd: {
+    title: 'Thêm sản phẩm vào giỏ',
+    desc: 'POST /api/cart/add/',
+    method: 'POST',
+    path: '/api/cart/add/',
+    fields: [
+      ['product', 'ID sản phẩm', 'number', '1'],
+      ['quantity', 'Số lượng', 'number', '2']
+    ]
+  },
+  cartUpdate: {
+    title: 'Sửa số lượng sản phẩm',
+    desc: 'PUT /api/cart/update/{id}/',
+    method: 'PUT',
+    path: '/api/cart/update/{id}/',
+    fields: [
+      ['id', 'ID CartItem', 'number', '1'],
+      ['quantity', 'Số lượng mới', 'number', '3']
+    ]
+  },
+  cartDelete: {
+    title: 'Xóa sản phẩm khỏi giỏ',
+    desc: 'DELETE /api/cart/delete/{id}/',
+    method: 'DELETE',
+    path: '/api/cart/delete/{id}/',
+    fields: [
+      ['id', 'ID CartItem', 'number', '1']
+    ]
+  }
+};
+let mode='register';
+function statusLabel(code) {
+  const labels = {
+    200: 'Thành công',
+    201: 'Tạo thành công',
+    204: 'Xóa thành công',
+    400: 'Yêu cầu không hợp lệ',
+    401: 'Vui lòng đăng nhập',
+    403: 'Bạn không có quyền thực hiện thao tác này',
+    404: 'Không tìm thấy dữ liệu',
+    405: 'Phương thức không được hỗ trợ',
+    409: 'Dữ liệu bị trùng',
+    500: 'Lỗi máy chủ'
+  };
+  return labels[code] || (code >= 200 && code < 300 ? 'Thành công' : 'Có lỗi xảy ra');
+}
+function render() {
+  const c=configs[mode]; document.getElementById('title').textContent=c.title; document.getElementById('description').textContent=c.desc;
+  document.getElementById('fields').innerHTML=c.fields.map(([name,label,type,placeholder]) =>
+    `<label for="${name}">${label}</label><input id="${name}" name="${name}" type="${type}" placeholder="${placeholder}" ${name==='id'?'min="1"':''} required>`
+  ).join('');
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));
+}
+document.querySelectorAll('.nav button').forEach(b=>b.addEventListener('click',()=>{mode=b.dataset.mode;render();}));
+document.getElementById('clear').addEventListener('click',()=>{document.getElementById('status').textContent='Chưa gửi request';document.getElementById('status').className='status';document.getElementById('response').textContent='Kết quả API sẽ hiển thị tại đây.';});
+document.getElementById('apiForm').addEventListener('submit', async e=>{
+  e.preventDefault();
+  const c=configs[mode], base=document.getElementById('baseUrl').value.trim().replace(/\/+$/,'');
+  const data={}; c.fields.forEach(([name])=>{const el=document.getElementById(name); if(el) data[name]=el.value;});
+  let path=c.path;
+  if(path.includes('{id}')) path=path.replace('{id}',encodeURIComponent(data.id));
+  delete data.id;
+  const options={method:c.method,headers:{'Accept':'application/json'}};
+  const token=document.getElementById('token').value.trim();
+  if(token) options.headers['Authorization']='Bearer '+token;
+  if(['POST','PUT','PATCH'].includes(c.method)){options.headers['Content-Type']='application/json';options.body=JSON.stringify(data);}
+  const statusEl=document.getElementById('status'), responseEl=document.getElementById('response');
+  statusEl.textContent='Đang gửi...'; statusEl.className='status';
+  try {
+    const res=await fetch(base+path,options);
+    const raw=await res.text(); let body; try{body=JSON.parse(raw)}catch{body=raw}
+    statusEl.textContent=`HTTP ${res.status} · ${statusLabel(res.status)}`; statusEl.className='status '+(res.ok?'ok':'bad');
+    responseEl.textContent=typeof body==='string'?body:JSON.stringify(body,null,2);
+    if(mode==='login' && res.ok && body.access) document.getElementById('token').value=body.access;
+  } catch(err) {
+    statusEl.textContent='Không kết nối được API'; statusEl.className='status bad';
+    responseEl.textContent='Không thể kết nối đến máy chủ. Hãy kiểm tra Django runserver, địa chỉ backend và cấu hình CORS.';
+  }
+  
+});
+render();
+</script>
+</body>
+</html>

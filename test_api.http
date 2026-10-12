@@ -1,0 +1,21 @@
+### Đăng ký
+
+POST http://127.0.0.1:8000/api/auth/register/
+Content-Type: application/json
+
+{
+"full_name": "Nguyen Van A",
+"email": "a@gmail.com",
+"phone": "0123456789",
+"password": "Abc12345@"
+}
+
+### Đăng nhập
+
+POST http://127.0.0.1:8000/api/auth/login/
+Content-Type: application/json
+
+{
+"email": "a@gmail.com",
+"password": "Abc12345@"
+}

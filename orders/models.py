@@ -45,11 +45,11 @@ class Order(models.Model):
     status = models.CharField(
         max_length=20,
         choices=[
-            ("PENDING", "Pending"),
-            ("CONFIRMED", "Confirmed"),
-            ("SHIPPING", "Shipping"),
-            ("COMPLETED", "Completed"),
-            ("CANCELLED", "Cancelled"),
+            ("PENDING", "Đang chờ xác nhận"),
+            ("CONFIRMED", "Đang xử lý"),
+            ("SHIPPING", "Đang vận chuyển"),
+            ("COMPLETED", "Đã giao"),
+            ("CANCELLED", "Đã hủy"),
         ],
         default="PENDING"
     )
