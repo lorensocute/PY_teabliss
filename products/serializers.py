@@ -35,7 +35,7 @@ class CategoryStatusSerializer(serializers.ModelSerializer):
 
 class ProductSerializer(serializers.ModelSerializer):
     price = serializers.DecimalField(max_digits=12, decimal_places=2, min_value=Decimal("0"))
-    stock_quantity = serializers.IntegerField(min_value=0, required=False)
+    stock_quantity = serializers.IntegerField(min_value=0, max_value=2147483647, required=False)
 
     class Meta:
         model = Product

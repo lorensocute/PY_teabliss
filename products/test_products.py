@@ -29,7 +29,7 @@ class ProductAPITests(APITestCase):
         Product.objects.create(category=self.other, name="Coffee", price="10.00", status="INACTIVE")
         response = self.client.get(self.list_url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 2)
+        self.assertEqual(len(response.data), 1)
         response = self.client.get(self.detail_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, {
@@ -118,6 +118,31 @@ class ProductAPITests(APITestCase):
         self.assertEqual(response.data["price"], "0.00")
         self.assertEqual(response.data["stock_quantity"], 0)
 
+    def test_stock_integer_boundaries_on_create_and_update(self):
+        self.client.force_authenticate(self.admin)
+        for value in (0, 2147483647):
+            with self.subTest(value=value):
+                response = self.client.post(self.list_url, {**self.payload, "stock_quantity": value}, format="json")
+                self.assertEqual(response.status_code, 201)
+                self.assertEqual(Product.objects.get(pk=response.data["id"]).stock_quantity, value)
+                response = self.client.put(self.detail_url, {**self.payload, "stock_quantity": value}, format="json")
+                self.assertEqual(response.status_code, 200)
+                self.product.refresh_from_db()
+                self.assertEqual(self.product.stock_quantity, value)
+
+    def test_stock_outside_mysql_integer_range_returns_400_without_writes(self):
+        self.client.force_authenticate(self.admin)
+        for value in (-1, 2147483648, "2147483648", 10 ** 30):
+            for method, url in ((self.client.post, self.list_url), (self.client.put, self.detail_url)):
+                with self.subTest(value=value, url=url):
+                    response = method(url, {**self.payload, "stock_quantity": value}, format="json")
+                    self.assertEqual(response.status_code, 400)
+                    self.assertIn("stock_quantity", response.data)
+        self.assertEqual(Product.objects.count(), 1)
+        self.product.refresh_from_db()
+        self.assertEqual(self.product.stock_quantity, 5)
+        self.assertEqual(self.product.name, "Green tea")
+
     def test_existing_inactive_category_can_be_kept(self):
         self.category.status = "INACTIVE"
         self.category.save(update_fields=["status"])
@@ -127,6 +152,7 @@ class ProductAPITests(APITestCase):
         self.assertEqual(self.client.put(self.detail_url, {**self.payload, "category": self.other.pk}, format="json").status_code, 200)
 
     def test_filter_search_and_ordering(self):
+        self.client.force_authenticate(self.admin)
         cheap = Product.objects.create(category=self.category, name="Black tea", price="5.00", status="INACTIVE")
         coffee = Product.objects.create(category=self.other, name="Coffee", price="10.00")
         cases = [

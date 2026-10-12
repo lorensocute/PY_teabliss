@@ -8,6 +8,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
 from products.permissions import IsActiveAdmin
+from products.pagination import OptionalPageNumberPagination
 from .admin_serializers import AdminUserSerializer, AdminUserStatusSerializer
 
 
@@ -16,6 +17,7 @@ class AdminUserViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewset
         "id", "email", "full_name", "phone", "role", "status", "is_active", "is_superuser"
     ).order_by("id")
     serializer_class = AdminUserSerializer
+    pagination_class = OptionalPageNumberPagination
     permission_classes = [IsActiveAdmin]
     http_method_names = ["get", "patch", "head", "options"]
 

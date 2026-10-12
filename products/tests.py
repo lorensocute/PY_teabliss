@@ -20,9 +20,9 @@ class CategoryAPITests(APITestCase):
         inactive = Category.objects.create(name="Coffee", status="INACTIVE")
         response = self.client.get(self.list_url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual([row["id"] for row in response.data], [self.category.pk, inactive.pk])
+        self.assertEqual([row["id"] for row in response.data], [self.category.pk])
         self.assertEqual(self.client.get(self.detail_url).data["name"], "Tea")
-        self.assertEqual(self.client.get(reverse("category-detail", args=[inactive.pk])).status_code, 200)
+        self.assertEqual(self.client.get(reverse("category-detail", args=[inactive.pk])).status_code, 404)
 
     def test_admin_create_and_update(self):
         self.client.force_authenticate(self.admin)

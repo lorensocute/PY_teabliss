@@ -7,6 +7,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
 from products.permissions import IsActiveAdmin
+from products.pagination import OptionalPageNumberPagination
 from .admin_serializers import AdminOrderSerializer, AdminOrderStatusSerializer
 from .models import Order, OrderItem
 
@@ -16,6 +17,7 @@ class AdminOrderViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewse
         Prefetch("items", queryset=OrderItem.objects.select_related("product").order_by("id"))
     ).order_by("-created_at", "-id")
     serializer_class = AdminOrderSerializer
+    pagination_class = OptionalPageNumberPagination
     permission_classes = [IsActiveAdmin]
     http_method_names = ["get", "patch", "head", "options"]
     transitions = {

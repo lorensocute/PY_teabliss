@@ -5,6 +5,7 @@ from rest_framework.exceptions import MethodNotAllowed, ValidationError
 from rest_framework.response import Response
 
 from products.permissions import IsActiveAdmin
+from products.pagination import OptionalPageNumberPagination
 from .models import Promotion
 from .serializers import PromotionSerializer, PromotionStatusSerializer
 
@@ -15,6 +16,7 @@ class PromotionViewSet(
 ):
     queryset = Promotion.objects.all().order_by("id")
     serializer_class = PromotionSerializer
+    pagination_class = OptionalPageNumberPagination
     # No publication flag exists: do not expose internal codes to public callers.
     permission_classes = [IsActiveAdmin]
     http_method_names = ["get", "post", "put", "patch", "head", "options"]

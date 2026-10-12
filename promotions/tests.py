@@ -261,7 +261,7 @@ class PromotionServiceTests(TestCase):
         self.assert_error("invalid_time", at=self.now.replace(tzinfo=None))
 
     def test_invalid_subtotal(self):
-        for subtotal in (100.0, "100", Decimal("-1"), Decimal("NaN"), Decimal("Infinity"), Decimal("1.001"), Decimal("10000000000")):
+        for subtotal in (100.0, "100", Decimal("-1"), Decimal("NaN"), Decimal("Infinity"), Decimal("1.001"), Decimal("10000000000000")):
             self.assert_error("invalid_subtotal", subtotal=subtotal)
 
     def test_zero_order_and_full_percentage(self):
@@ -291,3 +291,12 @@ class PromotionServiceTests(TestCase):
         self.promotion.refresh_from_db()
         self.assertEqual(self.promotion.discount_value, Decimal("10.00"))
         self.assertEqual(self.promotion.status, "ACTIVE")
+
+    def test_order_decimal_subtotal_boundaries(self):
+        for subtotal in (Decimal("10000000000.00"), Decimal("9999999999999.99")):
+            with self.subTest(subtotal=subtotal):
+                result = apply_promotion("TEA", subtotal)
+                self.assertEqual(result.discount_amount, (subtotal * Decimal("0.10")).quantize(Decimal("0.01")))
+                self.assertEqual(result.total_after_discount, subtotal - result.discount_amount)
+        self.assert_error("invalid_subtotal", subtotal=Decimal("10000000000000.00"))
+        self.assert_error("invalid_subtotal", subtotal=Decimal("9999999999999.999"))

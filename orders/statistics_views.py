@@ -3,7 +3,6 @@ from decimal import Decimal
 
 from django.contrib.auth import get_user_model
 from django.db.models import Count, Q, Sum
-from django.db.models.functions import TruncDate, TruncMonth
 from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.response import Response
@@ -12,6 +11,7 @@ from rest_framework.views import APIView
 from products.models import Product
 from products.permissions import IsActiveAdmin
 from .models import Order, OrderItem
+from .statistics_expressions import BUSINESS_TIMEZONE, RevenuePeriod
 
 
 class StatisticsQuerySerializer(serializers.Serializer):
@@ -31,7 +31,7 @@ class StatisticsQuerySerializer(serializers.Serializer):
 
 def filtered_orders(params):
     queryset = Order.objects.all()
-    tz = timezone.get_current_timezone()
+    tz = BUSINESS_TIMEZONE
     if params.get("start_date"):
         start = timezone.make_aware(datetime.combine(params["start_date"], time.min), tz)
         queryset = queryset.filter(created_at__gte=start)
@@ -71,7 +71,7 @@ class RevenueStatisticsView(StatisticsView):
     def get(self, request):
         params = self.parameters(request)
         orders = filtered_orders(params).filter(status="COMPLETED")
-        group = TruncDate("created_at", tzinfo=timezone.get_current_timezone()) if params["group_by"] == "day" else TruncMonth("created_at", tzinfo=timezone.get_current_timezone())
+        group = RevenuePeriod("created_at", params["group_by"])
         # Return at most 366 newest buckets, then sort chronologically for charts.
         rows = list(orders.order_by().annotate(period=group).values("period").annotate(
             revenue=Sum("total_amount"), order_count=Count("id")

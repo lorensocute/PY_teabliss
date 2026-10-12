@@ -27,7 +27,7 @@ class PromotionResult:
 def apply_promotion(code, subtotal, *, at=None):
     if not isinstance(subtotal, Decimal) or not subtotal.is_finite() or subtotal < 0:
         raise PromotionError("invalid_subtotal", "Subtotal must be a finite nonnegative Decimal.")
-    if subtotal > Decimal("9999999999.99") or subtotal != subtotal.quantize(Decimal("0.01")):
+    if subtotal > Decimal("9999999999999.99") or subtotal != subtotal.quantize(Decimal("0.01")):
         raise PromotionError("invalid_subtotal", "Subtotal is outside the supported money precision.")
     if not isinstance(code, str) or not code.strip():
         raise PromotionError("not_found", "Promotion code does not exist.")

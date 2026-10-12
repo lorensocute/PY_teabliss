@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
+from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
 from django.urls import reverse
@@ -7,6 +8,7 @@ from rest_framework.test import APITestCase
 
 from products.models import Category, Product
 from .models import Order, OrderItem
+from .statistics_expressions import RevenuePeriod
 
 
 class StatisticsAPITests(APITestCase):
@@ -119,3 +121,32 @@ class StatisticsAPITests(APITestCase):
         self.assertTrue(response.data["truncated"])
         self.assertEqual(len(response.data["results"]), 366)
         self.assertEqual(response.data["results"][0]["period"], "2024-01-02")
+
+    def test_revenue_local_midnight_and_month_boundary(self):
+        for timestamp, total in (("2026-01-31T16:59:59+00:00", "1.00"),
+                                 ("2026-01-31T17:00:00+00:00", "2.00"),
+                                 ("2026-01-31T23:00:00+00:00", "3.00")):
+            order = self.order("COMPLETED", total, "2026-01-01", [])
+            Order.objects.filter(pk=order.pk).update(created_at=datetime.fromisoformat(timestamp))
+        for group, periods in (("day", ["2026-01-31", "2026-02-01"]), ("month", ["2026-01", "2026-02"])):
+            response = self.client.get(self.urls["revenue"], {"group_by": group})
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.data["results"], [
+                {"period": periods[0], "revenue": "1.00", "order_count": 1},
+                {"period": periods[1], "revenue": "5.00", "order_count": 2},
+            ])
+        response = self.client.get(self.urls["revenue"], {"start_date": "2026-02-01", "end_date": "2026-02-01"})
+        self.assertEqual(response.data["results"], [{"period": "2026-02-01", "revenue": "5.00", "order_count": 2}])
+
+    def test_mysql_sql_uses_numeric_offsets_once_without_timezone_tables(self):
+        from django.db import connection
+
+        for group in ("day", "month"):
+            query = Order.objects.annotate(period=RevenuePeriod("created_at", group)).query
+            compiler = query.get_compiler(connection=connection)
+            with patch.object(connection, "vendor", "mysql"):
+                sql, params = compiler.compile(query.annotations["period"])
+            self.assertEqual(sql.count("CONVERT_TZ("), 1)
+            self.assertEqual(params[:2], ("+00:00", "+07:00"))
+            self.assertNotIn("Asia/Ho_Chi_Minh", params)
+            self.assertNotIn("UTC", params)

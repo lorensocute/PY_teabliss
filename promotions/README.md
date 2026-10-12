@@ -32,7 +32,8 @@ else:
 
 The service reads the promotion and does not create/update orders or promotions.
 `subtotal` represents merchandise value before discount; it must be a finite,
-nonnegative Decimal with at most two decimal places and at most 12 total digits.
+nonnegative Decimal with at most two decimal places and at most 15 total digits,
+matching Order totals. Promotion discount values retain their 12-digit limit.
 Optional `at` must be timezone-aware; the default is `timezone.now()`.
 Start/end instants are inclusive. Discounts round HALF_UP to two decimal places
 and cannot exceed subtotal. `minimum_order_value` is the model's minimum order

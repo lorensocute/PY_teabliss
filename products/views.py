@@ -8,7 +8,8 @@ from .serializers import (
     CategorySerializer, CategoryStatusSerializer,
     ProductSerializer, ProductStatusSerializer,
 )
-from .permissions import IsAdminOrReadOnly
+from .permissions import IsActiveAdmin, IsAdminOrReadOnly
+from .pagination import OptionalPageNumberPagination
 
 
 class CategoryViewSet(
@@ -21,6 +22,13 @@ class CategoryViewSet(
     queryset = Category.objects.all().order_by("id")
     serializer_class = CategorySerializer
     permission_classes = [IsAdminOrReadOnly]
+    pagination_class = OptionalPageNumberPagination
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if not IsActiveAdmin().has_permission(self.request, self):
+            queryset = queryset.filter(status="ACTIVE")
+        return queryset
 
     http_method_names = [
         "get",
@@ -63,11 +71,14 @@ class ProductViewSet(
 ):
     queryset = Product.objects.select_related("category").order_by("id")
     serializer_class = ProductSerializer
+    pagination_class = OptionalPageNumberPagination
     permission_classes = [IsAdminOrReadOnly]
     http_method_names = ["get", "post", "put", "patch", "head", "options"]
 
     def get_queryset(self):
         queryset = super().get_queryset()
+        if not IsActiveAdmin().has_permission(self.request, self):
+            queryset = queryset.filter(status="ACTIVE", category__status="ACTIVE")
         if self.action != "list":
             return queryset
         params = self.request.query_params
