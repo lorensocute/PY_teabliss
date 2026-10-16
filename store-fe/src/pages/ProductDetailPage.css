@@ -1,0 +1,637 @@
+/* ============================================================
+   TEABLISS - PRODUCT DETAIL PAGE STYLES
+   ============================================================ */
+
+.product-detail-page {
+  padding-bottom: var(--space-4xl);
+}
+
+.detail-loading-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 55vh;
+  gap: var(--space-md);
+  color: var(--color-text-secondary);
+}
+
+/* ─── Breadcrumb ─── */
+.detail-breadcrumb-wrap {
+  background: var(--color-bg-secondary);
+  border-bottom: 1px solid var(--color-border);
+  padding: 14px 0;
+  padding-top: calc(var(--navbar-height) + 14px);
+  margin-bottom: var(--space-2xl);
+}
+
+.detail-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.86rem;
+  color: var(--color-text-muted);
+}
+
+.detail-breadcrumb a {
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.detail-breadcrumb a:hover {
+  color: var(--color-primary);
+}
+
+.detail-breadcrumb .sep {
+  opacity: 0.4;
+}
+
+.detail-breadcrumb .current {
+  color: var(--color-primary-light);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 320px;
+}
+
+/* ─── Main 2-Column Layout ─── */
+.product-detail-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+  gap: var(--space-4xl);
+  align-items: start;
+}
+
+/* ─── CỘT TRÁI (LEFT COLUMN) ─── */
+.product-detail__left {
+  position: sticky;
+  top: calc(var(--navbar-height) + 24px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.product-detail__img-card {
+  position: relative;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-2xl);
+  overflow: hidden;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+}
+
+.product-detail__img-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 50%, rgba(212, 168, 83, 0.08) 0%, transparent 70%);
+}
+
+.product-detail__main-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.product-detail__img-wrap:hover .product-detail__main-img {
+  transform: scale(1.05);
+}
+
+.product-detail__img-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.3);
+}
+
+.product-detail__badges {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  z-index: 2;
+}
+
+.detail-badge {
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  backdrop-filter: blur(12px);
+}
+
+.detail-badge--cat {
+  background: rgba(13, 17, 23, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--color-text-primary);
+}
+
+.detail-badge--stock {
+  background: rgba(34, 197, 94, 0.18);
+  border: 1px solid rgba(34, 197, 94, 0.35);
+  color: #22c55e;
+}
+
+.detail-badge--out {
+  background: rgba(239, 68, 68, 0.18);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #ef4444;
+}
+
+/* Meta Box Cam Kết */
+.product-detail__meta-box {
+  background: rgba(26, 34, 51, 0.5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-lg);
+  backdrop-filter: blur(12px);
+}
+
+.meta-box__title {
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  color: var(--color-primary-light);
+  margin-bottom: var(--space-md);
+}
+
+.meta-box__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.meta-box__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.meta-box__icon {
+  font-size: 1.25rem;
+  line-height: 1;
+  margin-top: 2px;
+}
+
+.meta-box__item strong {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--color-text-primary);
+}
+
+.meta-box__item p {
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  margin: 2px 0 0 0;
+  line-height: 1.4;
+}
+
+/* ─── CỘT PHẢI (RIGHT COLUMN) ─── */
+.product-detail__right {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.detail-header-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.detail-cat-tag {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--color-primary);
+  text-transform: uppercase;
+}
+
+.detail-title {
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 3.5vw, 2.6rem);
+  font-weight: 800;
+  color: var(--color-text-primary);
+  line-height: 1.2;
+}
+
+.detail-desc {
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+  line-height: 1.65;
+  margin-top: 4px;
+}
+
+.detail-base-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-top: var(--space-sm);
+}
+
+.detail-base-price-label {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+.detail-base-price-value {
+  font-family: var(--font-heading);
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--color-primary);
+}
+
+.detail-stock-text {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.detail-separator {
+  height: 1px;
+  background: var(--color-border);
+}
+
+/* ─── CUSTOMIZATION SECTIONS ─── */
+.custom-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.custom-section__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.custom-section__title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  letter-spacing: 0.02em;
+}
+
+.custom-section__hint {
+  font-size: 0.82rem;
+  color: var(--color-primary-light);
+  font-weight: 500;
+}
+
+/* 1. Size Cards */
+.size-options-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.size-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-align: center;
+}
+
+.size-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(212, 168, 83, 0.4);
+  color: var(--color-text-primary);
+}
+
+.size-card.active {
+  background: linear-gradient(135deg, rgba(212, 168, 83, 0.2) 0%, rgba(184, 133, 46, 0.3) 100%);
+  border-color: var(--color-primary);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(212, 168, 83, 0.2);
+}
+
+.size-card__header {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.size-card__id {
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: inherit;
+}
+
+.size-card__volume {
+  font-size: 0.78rem;
+  opacity: 0.7;
+}
+
+.size-card__surcharge {
+  font-size: 0.82rem;
+  font-weight: 600;
+  margin-top: 4px;
+  color: var(--color-primary);
+}
+
+.size-card.active .size-card__surcharge {
+  color: var(--color-primary-light);
+}
+
+/* 2 & 3. Pill Options (Sweetness & Ice) */
+.pill-options-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  color: var(--color-text-secondary);
+  font-size: 0.86rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.pill-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(212, 168, 83, 0.4);
+  color: var(--color-text-primary);
+}
+
+.pill-btn.active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-text-inverse);
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(212, 168, 83, 0.25);
+}
+
+.pill-btn__val {
+  font-weight: 700;
+}
+
+.pill-btn__desc {
+  font-size: 0.76rem;
+  opacity: 0.75;
+}
+
+/* 4. Topping Grid */
+.topping-options-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.topping-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  font-size: 0.86rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-align: left;
+}
+
+.topping-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(212, 168, 83, 0.35);
+  color: var(--color-text-primary);
+}
+
+.topping-card.active {
+  background: rgba(212, 168, 83, 0.15);
+  border-color: var(--color-primary);
+  color: #fff;
+}
+
+.topping-card__check {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-right: 8px;
+  color: var(--color-primary);
+}
+
+.topping-card.active .topping-card__check {
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+
+.topping-card__name {
+  flex: 1;
+  font-weight: 500;
+}
+
+.topping-card__price {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-primary-light);
+  white-space: nowrap;
+}
+
+/* ─── 7. LIVE PRICE BREAKDOWN ─── */
+.price-breakdown-box {
+  background: rgba(13, 17, 23, 0.7);
+  border: 1px dashed rgba(212, 168, 83, 0.35);
+  border-radius: var(--radius-xl);
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.price-breakdown__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.88rem;
+  color: var(--color-text-secondary);
+}
+
+.price-breakdown__row.unit-row {
+  padding-top: 8px;
+  margin-top: 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--color-text-primary);
+  font-size: 1rem;
+}
+
+.unit-price-val {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  color: var(--color-primary);
+}
+
+.price-breakdown__row.total-calc-row {
+  font-size: 0.85rem;
+  color: var(--color-primary-light);
+  font-style: italic;
+}
+
+/* ─── 8 & 9. QUANTITY & ADD TO CART BAR ─── */
+.order-action-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.qty-picker {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  height: 52px;
+  padding: 0 4px;
+}
+
+.qty-picker__btn {
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: transparent;
+  color: var(--color-text-primary);
+  font-size: 1.2rem;
+  font-weight: 700;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: background var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qty-picker__btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--color-primary);
+}
+
+.qty-picker__btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.qty-picker__val {
+  min-width: 36px;
+  text-align: center;
+  font-family: var(--font-heading);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.order-action-bar__buttons {
+  flex: 1;
+  display: flex;
+  gap: var(--space-md);
+}
+
+.add-cart-btn {
+  flex: 1.4;
+  height: 52px;
+  font-size: 1rem !important;
+  font-weight: 700 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.buy-now-btn {
+  flex: 0.8;
+  height: 52px;
+  font-size: 0.95rem !important;
+  font-weight: 600 !important;
+  white-space: nowrap;
+}
+
+/* ─── 11. RELATED PRODUCTS SECTION ─── */
+.related-products-section {
+  margin-top: var(--space-4xl);
+  padding-top: var(--space-3xl);
+  border-top: 1px solid var(--color-border);
+}
+
+.related-products-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-xl);
+}
+
+/* ─── RESPONSIVE BREAKPOINTS ─── */
+@media (max-width: 1024px) {
+  .product-detail-layout {
+    grid-template-columns: 1fr;
+    gap: var(--space-2xl);
+  }
+
+  .product-detail__left {
+    position: static;
+    max-width: 520px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .related-products-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .size-options-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .topping-options-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .order-action-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .qty-picker {
+    justify-content: space-between;
+  }
+
+  .order-action-bar__buttons {
+    flex-direction: column;
+  }
+
+  .related-products-grid {
+    grid-template-columns: 1fr;
+  }
+}

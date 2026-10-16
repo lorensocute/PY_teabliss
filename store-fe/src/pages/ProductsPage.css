@@ -1,0 +1,418 @@
+/* ============================================================
+   TEABLISS - PRODUCTS PAGE / MENU STYLES
+   ============================================================ */
+
+/* ─── 1. MENU HERO (Gọn gàng, thanh lịch) ─── */
+.menu-hero {
+  position: relative;
+  padding: calc(var(--navbar-height) + 16px) 0 24px;
+  overflow: hidden;
+  background: var(--color-bg-secondary);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.menu-hero__bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse at 50% -20%, rgba(212, 168, 83, 0.15) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 80%, rgba(45, 212, 191, 0.06) 0%, transparent 50%),
+    var(--color-bg-secondary);
+}
+
+.menu-hero__inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+}
+
+.menu-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  margin-bottom: 4px;
+}
+
+.menu-breadcrumb a {
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.menu-breadcrumb a:hover {
+  color: var(--color-primary);
+}
+
+.menu-breadcrumb__sep {
+  opacity: 0.5;
+}
+
+.menu-breadcrumb__current {
+  color: var(--color-primary-light);
+  font-weight: 500;
+}
+
+.menu-hero__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 14px;
+  background: rgba(212, 168, 83, 0.1);
+  border: 1px solid rgba(212, 168, 83, 0.25);
+  border-radius: var(--radius-full);
+  color: var(--color-primary);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.menu-hero__badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--color-primary);
+  box-shadow: 0 0 8px var(--color-primary);
+}
+
+.menu-hero__title {
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 3.8vw, 3rem);
+  font-weight: 800;
+  color: var(--color-text-primary);
+  letter-spacing: -0.01em;
+  margin-top: 4px;
+}
+
+.menu-hero__desc {
+  color: var(--color-text-secondary);
+  font-size: 1.02rem;
+  max-width: 580px;
+  line-height: 1.6;
+}
+
+.menu-hero__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-top: var(--space-sm);
+  font-size: 0.84rem;
+  color: var(--color-text-muted);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.menu-hero__count-badge {
+  color: var(--color-primary-light);
+  font-weight: 600;
+}
+
+.menu-hero__divider {
+  opacity: 0.4;
+}
+
+/* ─── 2. CONTROLS & FILTER SECTION ─── */
+.menu-controls-section {
+  position: relative;
+  margin-top: -16px;
+  z-index: 10;
+}
+
+.menu-controls-card {
+  background: rgba(26, 34, 51, 0.9);
+  border: 1px solid rgba(212, 168, 83, 0.2);
+  border-radius: var(--radius-xl);
+  padding: 16px 22px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Top Row: Search & Sort */
+.menu-controls__top {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-lg);
+  align-items: center;
+}
+
+/* Search Box */
+.menu-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.menu-search__icon {
+  position: absolute;
+  left: 16px;
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+}
+
+.menu-search__input {
+  width: 100%;
+  height: 48px;
+  padding: 0 46px 0 48px;
+  background: rgba(13, 17, 23, 0.8);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  color: var(--color-text-primary);
+  font-size: 0.95rem;
+  font-family: inherit;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.menu-search__input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(212, 168, 83, 0.2);
+  background: rgba(13, 17, 23, 0.95);
+}
+
+.menu-search__input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.menu-search__clear {
+  position: absolute;
+  right: 14px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: var(--color-text-muted);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.75rem;
+  transition: all var(--transition-fast);
+}
+
+.menu-search__clear:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+/* Sort Dropdown */
+.menu-sort-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+
+.menu-sort-label {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.menu-sort-select {
+  height: 48px;
+  padding: 0 16px;
+  background: rgba(13, 17, 23, 0.8);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  color: var(--color-text-primary);
+  font-size: 0.9rem;
+  font-family: inherit;
+  cursor: pointer;
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.menu-sort-select:focus {
+  border-color: var(--color-primary);
+}
+
+/* ─── 3. RESULT INFO & ACTIVE FILTER CHIPS ─── */
+.menu-result-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  flex-wrap: wrap;
+}
+
+.menu-result-info__count {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+.menu-result-info__count strong {
+  color: var(--color-primary-light);
+}
+
+.menu-active-chips {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.menu-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  background: rgba(212, 168, 83, 0.12);
+  border: 1px solid rgba(212, 168, 83, 0.3);
+  border-radius: var(--radius-full);
+  color: var(--color-primary-light);
+  font-size: 0.8rem;
+}
+
+.menu-chip strong {
+  color: #fff;
+}
+
+.menu-chip button {
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  cursor: pointer;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  padding: 0;
+  margin-left: 2px;
+}
+
+.menu-chip button:hover {
+  color: #fff;
+}
+
+.menu-chip-reset {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 2px 6px;
+  transition: color var(--transition-fast);
+}
+
+.menu-chip-reset:hover {
+  color: var(--color-primary);
+}
+
+/* ─── 4. GRID SECTION ─── */
+.menu-grid-section {
+  padding: 24px 0 var(--space-3xl);
+}
+
+.menu-product-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-xl);
+}
+
+/* Loading State */
+.menu-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+  padding: 100px 0;
+  color: var(--color-text-secondary);
+}
+
+/* Empty State */
+.menu-empty-state {
+  padding: 80px 20px;
+  text-align: center;
+  max-width: 580px;
+  margin: 0 auto;
+}
+
+.menu-empty-state .empty-state__icon {
+  font-size: 3.5rem;
+  margin-bottom: var(--space-sm);
+  filter: drop-shadow(0 4px 16px rgba(212, 168, 83, 0.3));
+}
+
+.menu-empty-state .empty-state__title {
+  font-family: var(--font-heading);
+  font-size: 1.6rem;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-xs);
+}
+
+.menu-empty-state .empty-state__desc {
+  font-size: 0.95rem;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  margin-bottom: var(--space-lg);
+}
+
+/* ─── 6. RESPONSIVE BREAKPOINTS ─── */
+@media (max-width: 1200px) {
+  .menu-product-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-lg);
+  }
+}
+
+@media (max-width: 900px) {
+  .menu-controls__top {
+    grid-template-columns: 1fr;
+  }
+
+  .menu-sort-wrap {
+    justify-content: flex-end;
+  }
+
+  .menu-product-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .menu-hero {
+    padding: calc(var(--navbar-height) + var(--space-md)) 0 var(--space-xl);
+  }
+
+  .menu-controls-card {
+    padding: var(--space-md);
+    border-radius: var(--radius-xl);
+    gap: var(--space-md);
+  }
+
+  .menu-sort-wrap {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .menu-sort-select {
+    flex: 1;
+  }
+
+  .menu-result-info {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .menu-product-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-md);
+  }
+}
