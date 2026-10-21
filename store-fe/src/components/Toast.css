@@ -1,0 +1,26 @@
+.toast__icon { font-size: 1rem; flex-shrink: 0; }
+
+.toast__message {
+  flex: 1;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  line-height: 1.4;
+}
+
+.toast__close {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  font-size: 0.8rem;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.toast__close:hover {
+  color: var(--color-text-primary);
+  background: var(--color-bg-glass);
+}
