@@ -45,7 +45,6 @@ async function request(endpoint, options = {}) {
         );
     }
 
-    // Hỗ trợ cả dữ liệu Django trực tiếp và dạng { data: ... }.
     return json?.data !== undefined ? json.data : json;
 }
 
@@ -139,63 +138,63 @@ export const api = {
     // CATEGORY
 
     getCategories: (params = {}) =>
-        request(`/categories${queryString(params)}`),
+        request(`/categories/${queryString(params)}`),
 
     getCategoryById: (id) =>
-        request(`/categories/${id}`),
+        request(`/categories/${id}/`),
 
     createCategory: (data) =>
-        request('/categories', {
+        request('/categories/', {
             method: 'POST',
             body: JSON.stringify(data),
         }),
 
     updateCategory: (id, data) =>
-        request(`/categories/${id}`, {
+        request(`/categories/${id}/`, {
             method: 'PUT',
             body: JSON.stringify(data),
         }),
 
     deactivateCategory: (id) =>
-        request(`/categories/${id}/status`, {
+        request(`/categories/${id}/status/`, {
             method: 'PATCH',
         }),
 
     deleteCategory: (id) =>
-        request(`/categories/${id}/status`, {
+        request(`/categories/${id}/status/`, {
             method: 'PATCH',
         }),
 
     // PRODUCT
 
     getProducts: (params = {}) =>
-        request(`/products${queryString(params)}`),
+        request(`/products/${queryString(params)}`),
 
     searchProducts: (params = {}) =>
-        request(`/products/search${queryString(params)}`),
+        request(`/products/search/${queryString(params)}`),
 
     getProductById: (id) =>
-        request(`/products/${id}`),
+        request(`/products/${id}/`),
 
     createProduct: (data) =>
-        request('/products', {
+        request('/products/', {
             method: 'POST',
             body: JSON.stringify(data),
         }),
 
     updateProduct: (id, data) =>
-        request(`/products/${id}`, {
+        request(`/products/${id}/`, {
             method: 'PUT',
             body: JSON.stringify(data),
         }),
 
     deactivateProduct: (id) =>
-        request(`/products/${id}/status`, {
+        request(`/products/${id}/status/`, {
             method: 'PATCH',
         }),
 
     deleteProduct: (id) =>
-        request(`/products/${id}/status`, {
+        request(`/products/${id}/status/`, {
             method: 'PATCH',
         }),
 
