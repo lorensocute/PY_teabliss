@@ -1,18 +1,17 @@
-const API_BASE_URL = 'http://localhost:8080/api';
+const API_BASE_URL = 'http://127.0.0.1:8000/api';
 
 async function request(endpoint, options = {}) {
+    const token = localStorage.getItem('access');
+
     const headers = {
         'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...options.headers,
     };
 
     const res = await fetch(`${API_BASE_URL}${endpoint}`, {
         ...options,
         headers,
-
-        // Backend dùng HttpSession.
-        // Bắt buộc gửi/nhận cookie JSESSIONID.
-        credentials: 'include',
     });
 
     let json = null;
@@ -20,103 +19,127 @@ async function request(endpoint, options = {}) {
     try {
         json = await res.json();
     } catch {
-        // Trường hợp response không có JSON body
+        // Response có thể không có nội dung.
     }
 
     if (!res.ok || json?.success === false) {
+        const errors = json && typeof json === 'object'
+            ? Object.entries(json)
+                .map(([field, value]) => {
+                    const message = Array.isArray(value)
+                        ? value.join(' ')
+                        : typeof value === 'object'
+                            ? JSON.stringify(value)
+                            : String(value);
+
+                    return `${field}: ${message}`;
+                })
+                .join('\n')
+            : '';
+
         throw new Error(
-            json?.message || `Có lỗi xảy ra (${res.status})`
+            json?.detail ||
+            json?.message ||
+            errors ||
+            `Có lỗi xảy ra (${res.status})`
         );
     }
 
-    return json?.data;
+    // Hỗ trợ cả dữ liệu Django trực tiếp và dạng { data: ... }.
+    return json?.data !== undefined ? json.data : json;
+}
+
+function queryString(params = {}) {
+    const cleanParams = Object.fromEntries(
+        Object.entries(params).filter(
+            ([, value]) =>
+                value !== undefined &&
+                value !== null &&
+                value !== ''
+        )
+    );
+
+    const query = new URLSearchParams(cleanParams).toString();
+    return query ? `?${query}` : '';
 }
 
 export const api = {
-
-    // =====================================================
     // AUTH
-    // =====================================================
 
-    login: (email, password) =>
-        request('/auth/login', {
+    login: async (email, password) => {
+        const data = await request('/auth/login/', {
             method: 'POST',
-            body: JSON.stringify({
-                email,
-                password,
-            }),
-        }),
+            body: JSON.stringify({ email, password }),
+        });
+
+        if (data?.access) {
+            localStorage.setItem('access', data.access);
+        }
+
+        if (data?.refresh) {
+            localStorage.setItem('refresh', data.refresh);
+        }
+
+        return data;
+    },
 
     register: (data) =>
-        request('/auth/register', {
+        request('/auth/register/', {
             method: 'POST',
             body: JSON.stringify(data),
         }),
 
-    logout: () =>
-        request('/auth/logout', {
-            method: 'POST',
-        }),
+    logout: async () => {
+        localStorage.removeItem('access');
+        localStorage.removeItem('refresh');
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        return null;
+    },
 
-    // =====================================================
     // PROFILE
-    // =====================================================
 
     getProfile: () =>
-        request('/profile'),
+        request('/profile/'),
 
     updateProfile: (data) =>
-        request('/profile', {
+        request('/profile/', {
             method: 'PUT',
             body: JSON.stringify(data),
         }),
 
     changePassword: (data) =>
-        request('/profile/password', {
+        request('/profile/password/', {
             method: 'PUT',
             body: JSON.stringify(data),
         }),
 
-    // =====================================================
     // ADDRESS
-    // =====================================================
 
     getAddresses: () =>
-        request('/profile/addresses'),
+        request('/profile/addresses/'),
 
     createAddress: (data) =>
-        request('/profile/addresses', {
+        request('/profile/addresses/', {
             method: 'POST',
             body: JSON.stringify(data),
         }),
 
     updateAddress: (id, data) =>
-        request(`/profile/addresses/${id}`, {
+        request(`/profile/addresses/${id}/`, {
             method: 'PUT',
             body: JSON.stringify(data),
         }),
 
     deleteAddress: (id) =>
-        request(`/profile/addresses/${id}`, {
+        request(`/profile/addresses/${id}/`, {
             method: 'DELETE',
         }),
 
-    // =====================================================
     // CATEGORY
-    // =====================================================
 
-    getCategories: (params = {}) => {
-        const cleanParams = Object.fromEntries(
-            Object.entries(params).filter(
-                ([, value]) =>
-                    value !== undefined &&
-                    value !== null &&
-                    value !== ''
-            )
-        );
-        const query = new URLSearchParams(cleanParams).toString();
-        return request(`/categories${query ? `?${query}` : ''}`);
-    },
+    getCategories: (params = {}) =>
+        request(`/categories${queryString(params)}`),
 
     getCategoryById: (id) =>
         request(`/categories/${id}`),
@@ -133,57 +156,23 @@ export const api = {
             body: JSON.stringify(data),
         }),
 
-    // Backend dùng soft delete / INACTIVE
     deactivateCategory: (id) =>
         request(`/categories/${id}/status`, {
             method: 'PATCH',
         }),
 
-    // Giữ alias để frontend cũ chưa cần sửa ngay
     deleteCategory: (id) =>
         request(`/categories/${id}/status`, {
             method: 'PATCH',
         }),
 
-    // =====================================================
     // PRODUCT
-    // =====================================================
 
-    getProducts: (params = {}) => {
-        const cleanParams = Object.fromEntries(
-            Object.entries(params).filter(
-                ([, value]) =>
-                    value !== undefined &&
-                    value !== null &&
-                    value !== ''
-            )
-        );
+    getProducts: (params = {}) =>
+        request(`/products${queryString(params)}`),
 
-        const query =
-            new URLSearchParams(cleanParams).toString();
-
-        return request(
-            `/products${query ? `?${query}` : ''}`
-        );
-    },
-
-    searchProducts: (params = {}) => {
-        const cleanParams = Object.fromEntries(
-            Object.entries(params).filter(
-                ([, value]) =>
-                    value !== undefined &&
-                    value !== null &&
-                    value !== ''
-            )
-        );
-
-        const query =
-            new URLSearchParams(cleanParams).toString();
-
-        return request(
-            `/products/search${query ? `?${query}` : ''}`
-        );
-    },
+    searchProducts: (params = {}) =>
+        request(`/products/search${queryString(params)}`),
 
     getProductById: (id) =>
         request(`/products/${id}`),
@@ -200,21 +189,17 @@ export const api = {
             body: JSON.stringify(data),
         }),
 
-    // Backend dùng soft delete / INACTIVE
     deactivateProduct: (id) =>
         request(`/products/${id}/status`, {
             method: 'PATCH',
         }),
 
-    // Alias cho code frontend cũ
     deleteProduct: (id) =>
         request(`/products/${id}/status`, {
             method: 'PATCH',
         }),
 
-    // =====================================================
     // CART
-    // =====================================================
 
     getCart: () =>
         request('/cart'),
@@ -228,9 +213,7 @@ export const api = {
     updateCartItem: (itemId, quantity) =>
         request(
             `/cart/items/${itemId}?quantity=${encodeURIComponent(quantity)}`,
-            {
-                method: 'PUT',
-            }
+            { method: 'PUT' }
         ),
 
     removeFromCart: (itemId) =>
@@ -243,9 +226,7 @@ export const api = {
             method: 'DELETE',
         }),
 
-    // =====================================================
     // ORDER - CUSTOMER
-    // =====================================================
 
     createOrder: (data) =>
         request('/orders', {
@@ -264,9 +245,7 @@ export const api = {
             method: 'PATCH',
         }),
 
-    // =====================================================
     // PROMOTION
-    // =====================================================
 
     getPromotions: () =>
         request('/promotions'),
@@ -291,9 +270,7 @@ export const api = {
             method: 'PATCH',
         }),
 
-    // =====================================================
     // ADMIN - USERS
-    // =====================================================
 
     getAdminUsers: () =>
         request('/admin/users'),
@@ -306,9 +283,7 @@ export const api = {
             method: 'PATCH',
         }),
 
-    // =====================================================
     // ADMIN - ORDERS
-    // =====================================================
 
     getAdminOrders: () =>
         request('/admin/orders'),
@@ -316,14 +291,10 @@ export const api = {
     updateOrderStatus: (id, status) =>
         request(`/admin/orders/${id}/status`, {
             method: 'PATCH',
-            body: JSON.stringify({
-                status,
-            }),
+            body: JSON.stringify({ status }),
         }),
 
-    // =====================================================
     // ADMIN - STATISTICS
-    // =====================================================
 
     getAdminStats: () =>
         request('/admin/statistics/overview'),
@@ -334,21 +305,11 @@ export const api = {
     getProductStats: () =>
         request('/admin/statistics/products'),
 
-    getRevenueStats: (from, to) => {
-        const params = new URLSearchParams();
-
-        if (from) {
-            params.append('from', from);
-        }
-
-        if (to) {
-            params.append('to', to);
-        }
-
-        const query = params.toString();
-
-        return request(
-            `/admin/statistics/revenue${query ? `?${query}` : ''}`
-        );
-    },
+    getRevenueStats: (from, to) =>
+        request(
+            `/admin/statistics/revenue${queryString({
+                from: from || undefined,
+                to: to || undefined,
+            })}`
+        ),
 };
