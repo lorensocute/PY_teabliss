@@ -276,7 +276,7 @@ function ProductsTab() {
       name: p.name || '',
       price: p.price ?? '',
       stockQuantity: p.stockQuantity ?? 0,
-      categoryId: p.categoryId || '',
+      categoryId: p.category?.id ?? p.category ?? p.categoryId ?? '',
       imageUrl: p.imageUrl || '',
       description: p.description || '',
     });
@@ -313,9 +313,9 @@ function ProductsTab() {
       name: form.name.trim(),
       price: Number(form.price),
       stockQuantity: Number(form.stockQuantity),
-      categoryId: Number(form.categoryId),
+      category: Number(form.categoryId),
       imageUrl: form.imageUrl.trim() || null,
-      description: form.description.trim() || null,
+      description: form.description.trim(),
     };
 
     try {
